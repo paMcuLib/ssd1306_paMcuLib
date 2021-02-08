@@ -1,6 +1,6 @@
-#include "pa_Defines.h"
+#include "all_config.h"
 
-#ifdef DISPLAY_USE_SSD1306
+#if DISPLAY_USE_SSD1306
 
 /////////////////////////////////////////////////////////////////////////////////
 //              GND   电源地
@@ -33,20 +33,24 @@ Protocal OLED_chosenProtocal;
 
 // D0                         4 线 ISP 接口模式：时钟线（CLK）
 // D1                         4 线 ISP 接口模式：串行数据线（MOSI）
-void OLED_initSpiGpio(){
-    pinMode(OLED_CS_Port,  OUTPUT);
-    pinMode(OLED_DC_Port,  OUTPUT);
-    pinMode(OLED_RST_Port,  OUTPUT);
+void OLED_initSpiGpio()
+{
+    pinMode(OLED_CS_Port, OUTPUT);
+    pinMode(OLED_DC_Port, OUTPUT);
+    pinMode(OLED_RST_Port, OUTPUT);
 }
 
-void OLED_setCS(char state){
+void OLED_setCS(char state)
+{
     digitalWrite(OLED_CS_Port, state);
 }
 
-void OLED_setDC(char state){
+void OLED_setDC(char state)
+{
     digitalWrite(OLED_DC_Port, state);
 }
-void OLED_setRST(char state){
+void OLED_setRST(char state)
+{
     digitalWrite(OLED_RST_Port, state);
 }
 #endif
@@ -62,31 +66,44 @@ void OLED_setRST(char state){
 
 // D0                         4 线 ISP 接口模式：时钟线（CLK）
 // D1                         4 线 ISP 接口模式：串行数据线（MOSI）
-void OLED_initSpiGpio(){
-    GPIO_setAsOutputPin(OLED_CS_Port, OLED_CS_Pin);   
-    GPIO_setAsOutputPin(OLED_DC_Port, OLED_DC_Pin);   
-    GPIO_setAsOutputPin(OLED_RST_Port, OLED_RST_Pin); 
+void OLED_initSpiGpio()
+{
+    GPIO_setAsOutputPin(OLED_CS_Port, OLED_CS_Pin);
+    GPIO_setAsOutputPin(OLED_DC_Port, OLED_DC_Pin);
+    GPIO_setAsOutputPin(OLED_RST_Port, OLED_RST_Pin);
 }
 
-void OLED_setCS(char state){
-    if(state){
+void OLED_setCS(char state)
+{
+    if (state)
+    {
         MAP_GPIO_setOutputHighOnPin(OLED_CS_Port, OLED_CS_Pin);
-    }else{
+    }
+    else
+    {
         MAP_GPIO_setOutputLowOnPin(OLED_CS_Port, OLED_CS_Pin);
     }
 }
 
-void OLED_setDC(char state){
-    if(state){
+void OLED_setDC(char state)
+{
+    if (state)
+    {
         MAP_GPIO_setOutputHighOnPin(OLED_DC_Port, OLED_DC_Pin);
-    }else{
+    }
+    else
+    {
         MAP_GPIO_setOutputLowOnPin(OLED_DC_Port, OLED_DC_Pin);
     }
 }
-void OLED_setRST(char state){
-    if(state){
+void OLED_setRST(char state)
+{
+    if (state)
+    {
         MAP_GPIO_setOutputHighOnPin(OLED_RST_Port, OLED_RST_Pin);
-    }else{
+    }
+    else
+    {
         MAP_GPIO_setOutputLowOnPin(OLED_RST_Port, OLED_RST_Pin);
     }
 }
@@ -94,14 +111,14 @@ void OLED_setRST(char state){
 ////////////////////////////////////////////////////////////////////////////////
 void OLED_Write_IIC_Command(unsigned char IIC_Command)
 {
-    pa_IIC_writeLen(SSD1306_I2C_ADDRESS,0x00,1,&IIC_Command,OLED_IICSettingStruct);
+    pa_IIC_writeLen(SSD1306_I2C_ADDRESS, 0x00, 1, &IIC_Command, OLED_IICSettingStruct);
 }
 /**********************************************
 // IIC Write Data
 **********************************************/
 void OLED_Write_IIC_Data(unsigned char IIC_Data)
 {
-    pa_IIC_writeLen(SSD1306_I2C_ADDRESS,0x40,1,&IIC_Data,OLED_IICSettingStruct);
+    pa_IIC_writeLen(SSD1306_I2C_ADDRESS, 0x40, 1, &IIC_Data, OLED_IICSettingStruct);
 }
 void OLED_WR_Byte(unsigned char dat, unsigned char cmd)
 {
@@ -123,7 +140,7 @@ void OLED_WR_Byte(unsigned char dat, unsigned char cmd)
             OLED_setCS(1);
             OLED_setDC(1);
             OLED_setCS(0);
-            pa_spiTransmit(&dat,1);
+            pa_spiTransmit(&dat, 1);
             OLED_setCS(1);
             // digitalWrite(cs, HIGH);
             // digitalWrite(dc, HIGH);
@@ -137,7 +154,7 @@ void OLED_WR_Byte(unsigned char dat, unsigned char cmd)
             OLED_setCS(1);
             OLED_setDC(0);
             OLED_setCS(0);
-            pa_spiTransmit(&dat,1);
+            pa_spiTransmit(&dat, 1);
             OLED_setCS(1);
             // digitalWrite(cs, HIGH);
             // digitalWrite(dc, LOW);
@@ -155,14 +172,14 @@ void OLED_WR_Byte(unsigned char dat, unsigned char cmd)
 /********************************************
 // fill_Picture
 ********************************************/
-void fill_picture(unsigned char * fill_Data)
+void fill_picture(unsigned char *fill_Data)
 {
     OLED_WR_Byte(0x21, 0); //page0-page1
-    OLED_WR_Byte(0x00, 0);     //low column start address
-    OLED_WR_Byte(0x7f, 0);     //high column start a
+    OLED_WR_Byte(0x00, 0); //low column start address
+    OLED_WR_Byte(0x7f, 0); //high column start a
     OLED_WR_Byte(0x22, 0); //page0-page1
-    OLED_WR_Byte(0x00, 0);     //low column start address
-    OLED_WR_Byte(0x07, 0);     //high column start a
+    OLED_WR_Byte(0x00, 0); //low column start address
+    OLED_WR_Byte(0x07, 0); //high column start a
     // pa_IIC_writeLen(SSD1306_I2C_ADDRESS, 0x40,128,fill_Data);
     // pa_IIC_writeLen(SSD1306_I2C_ADDRESS, 0x40,128,fill_Data+);
     // pa_IIC_writeLen(SSD1306_I2C_ADDRESS, 0x40,128,fill_Data);
@@ -172,7 +189,7 @@ void fill_picture(unsigned char * fill_Data)
         // OLED_WR_Byte(0xb0 + m, 0); //page0-page1
         // OLED_WR_Byte(0x00, 0);     //low column start address
         // OLED_WR_Byte(0x10, 0);     //high column start address
-        pa_IIC_writeLen(SSD1306_I2C_ADDRESS, 0x40,128,fill_Data+128*m,OLED_IICSettingStruct);
+        pa_IIC_writeLen(SSD1306_I2C_ADDRESS, 0x40, 128, fill_Data + 128 * m, OLED_IICSettingStruct);
         // for (n = 0; n < 128; n++)
         // {
         //     OLED_WR_Byte(fill_Data, 1);
@@ -366,10 +383,11 @@ void OLED_DrawBMP(unsigned char x0, unsigned char y0, unsigned char x1, unsigned
 //初始化SSD1306
 void OLED_Init(Protocal chosenProtocal)
 {
-    OLED_IICSettingStruct.delay=60;
-    OLED_chosenProtocal=chosenProtocal;
+    OLED_IICSettingStruct.delay = 60;
+    OLED_chosenProtocal = chosenProtocal;
 
-    if(OLED_chosenProtocal==Protocal::Protocal_SPI){
+    if (OLED_chosenProtocal == Protocal::Protocal_SPI)
+    {
         OLED_initSpiGpio();
         OLED_setRST(1);
         pa_delayMs(1);
@@ -414,7 +432,7 @@ void OLED_Init(Protocal chosenProtocal)
     OLED_WR_Byte(0x14, OLED_CMD); //
 
     OLED_WR_Byte(0xAF, OLED_CMD); //--turn on oled panel
-    
+
     // oled_write_cmd(0x20);    // Set Memory Addressing Mode (20h)
     // oled_write_cmd(0x02);
 }

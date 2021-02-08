@@ -1,5 +1,5 @@
-#include "pa_Defines.h"
-#ifdef DISPLAY_USE_SSD1306
+#include "all_config.h"
+#if DISPLAY_USE_SSD1306
 
 #ifndef __PA_OLED_DRV_H__
 #define __PA_OLED_DRV_H__

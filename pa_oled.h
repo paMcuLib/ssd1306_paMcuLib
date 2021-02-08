@@ -1,6 +1,6 @@
-#include "pa_Defines.h"
+#include "all_config.h"
 
-#ifdef DISPLAY_USE_SSD1306
+#if DISPLAY_USE_SSD1306
 
 /////////////////////////////////////////////////////////////////////////////////
 //              GND   电源地
@@ -24,8 +24,8 @@
 #define Y_WIDTH 64
 
 //------------------可修改------------------
-#define SSD1306_I2C_ADDRESS   0x3c //oled地址
-#define HARD_SSD1306_I2C      hi2c1//hard_i2c对象
+#define SSD1306_I2C_ADDRESS 0x3c //oled地址
+#define HARD_SSD1306_I2C hi2c1   //hard_i2c对象
 
 #define OLED_CMD 0  //写命令
 #define OLED_DATA 1 //写数据
@@ -46,11 +46,10 @@ void OLED_ShowCHinese(unsigned char x, unsigned char y, unsigned char no);
 void OLED_DrawBMP(unsigned char x0, unsigned char y0, unsigned char x1, unsigned char y1, unsigned char BMP[]);
 void Delay_50ms(unsigned int Del_50ms);
 void Delay_1ms(unsigned int Del_1ms);
-void fill_picture(unsigned char * fill_Data);
+void fill_picture(unsigned char *fill_Data);
 void Picture(void);
 void IIC_Start(void);
 void IIC_Stop(void);
-
 
 void OLED_Write_IIC_Command(unsigned char IIC_Command);
 void OLED_Write_IIC_Data(unsigned char IIC_Data);
@@ -60,5 +59,3 @@ void IIC_Wait_Ack(void);
 #endif
 
 #endif
-
-
