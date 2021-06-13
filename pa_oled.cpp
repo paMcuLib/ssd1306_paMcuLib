@@ -9,117 +9,12 @@
 //              SDA   接PA7（SDA）
 /////////////////////////////////////////////////////////////////////////////////
 
-extern "C"
-{
 #include "pa_oled.h"
 #include "stdlib.h"
 #include "pa_oledfont.h"
-#include "pa_CommonLib/src/drv/pa_HardwareIIC/pa_HardwareIIC.h"
+
 #include "pa_oled_drv.h"
-}
-pa_IICSettingStruct OLED_IICSettingStruct;
-Protocal OLED_chosenProtocal;
 
-/*****************************************************
-//hardware driver//
-
-*****************************************************/
-
-/****************************************************/
-#ifdef ESP32
-#define OLED_CS_Port 12
-#define OLED_DC_Port 14
-#define OLED_RST_Port 13
-
-// D0                         4 线 ISP 接口模式：时钟线（CLK）
-// D1                         4 线 ISP 接口模式：串行数据线（MOSI）
-void OLED_initSpiGpio()
-{
-    pinMode(OLED_CS_Port, OUTPUT);
-    pinMode(OLED_DC_Port, OUTPUT);
-    pinMode(OLED_RST_Port, OUTPUT);
-}
-
-void OLED_setCS(char state)
-{
-    digitalWrite(OLED_CS_Port, state);
-}
-
-void OLED_setDC(char state)
-{
-    digitalWrite(OLED_DC_Port, state);
-}
-void OLED_setRST(char state)
-{
-    digitalWrite(OLED_RST_Port, state);
-}
-#endif
-#ifdef MSP432P
-#define OLED_CS_Port GPIO_PORT_P4
-#define OLED_CS_Pin GPIO_PIN1
-
-#define OLED_DC_Port GPIO_PORT_P4
-#define OLED_DC_Pin GPIO_PIN2
-
-#define OLED_RST_Port GPIO_PORT_P4
-#define OLED_RST_Pin GPIO_PIN0
-
-// D0                         4 线 ISP 接口模式：时钟线（CLK）
-// D1                         4 线 ISP 接口模式：串行数据线（MOSI）
-void OLED_initSpiGpio()
-{
-    GPIO_setAsOutputPin(OLED_CS_Port, OLED_CS_Pin);
-    GPIO_setAsOutputPin(OLED_DC_Port, OLED_DC_Pin);
-    GPIO_setAsOutputPin(OLED_RST_Port, OLED_RST_Pin);
-}
-
-void OLED_setCS(char state)
-{
-    if (state)
-    {
-        MAP_GPIO_setOutputHighOnPin(OLED_CS_Port, OLED_CS_Pin);
-    }
-    else
-    {
-        MAP_GPIO_setOutputLowOnPin(OLED_CS_Port, OLED_CS_Pin);
-    }
-}
-
-void OLED_setDC(char state)
-{
-    if (state)
-    {
-        MAP_GPIO_setOutputHighOnPin(OLED_DC_Port, OLED_DC_Pin);
-    }
-    else
-    {
-        MAP_GPIO_setOutputLowOnPin(OLED_DC_Port, OLED_DC_Pin);
-    }
-}
-void OLED_setRST(char state)
-{
-    if (state)
-    {
-        MAP_GPIO_setOutputHighOnPin(OLED_RST_Port, OLED_RST_Pin);
-    }
-    else
-    {
-        MAP_GPIO_setOutputLowOnPin(OLED_RST_Port, OLED_RST_Pin);
-    }
-}
-#endif
-////////////////////////////////////////////////////////////////////////////////
-void OLED_Write_IIC_Command(unsigned char IIC_Command)
-{
-    pa_IIC_writeLen(SSD1306_I2C_ADDRESS, 0x00, 1, &IIC_Command, OLED_IICSettingStruct);
-}
-/**********************************************
-// IIC Write Data
-**********************************************/
-void OLED_Write_IIC_Data(unsigned char IIC_Data)
-{
-    pa_IIC_writeLen(SSD1306_I2C_ADDRESS, 0x40, 1, &IIC_Data, OLED_IICSettingStruct);
-}
 void OLED_WR_Byte(unsigned char dat, unsigned char cmd)
 {
     switch (OLED_chosenProtocal)
@@ -189,7 +84,7 @@ void fill_picture(unsigned char *fill_Data)
         // OLED_WR_Byte(0xb0 + m, 0); //page0-page1
         // OLED_WR_Byte(0x00, 0);     //low column start address
         // OLED_WR_Byte(0x10, 0);     //high column start address
-        pa_IIC_writeLen(SSD1306_I2C_ADDRESS, 0x40, 128, fill_Data + 128 * m, OLED_IICSettingStruct);
+        OLED_iicWriteLen(SSD1306_I2C_ADDRESS, 0x40, 128, fill_Data + 128 * m, OLED_IICSettingStruct);
         // for (n = 0; n < 128; n++)
         // {
         //     OLED_WR_Byte(fill_Data, 1);
@@ -379,22 +274,27 @@ void OLED_DrawBMP(unsigned char x0, unsigned char y0, unsigned char x1, unsigned
         }
     }
 }
+namespace SSD1306
+{
+    char protocalId;
+}
 
 //初始化SSD1306
-void OLED_Init(Protocal chosenProtocal)
+void OLED_Init(char protocal_id)
 {
-    OLED_IICSettingStruct.delay = 60;
-    OLED_chosenProtocal = chosenProtocal;
+    SSD1306::protocalId = protocal_id;
+    // OLED_IICSettingStruct.delay = 60;
+    // OLED_chosenProtocal = chosenProtocal;
 
-    if (OLED_chosenProtocal == Protocal::Protocal_SPI)
-    {
-        OLED_initSpiGpio();
-        OLED_setRST(1);
-        pa_delayMs(1);
-        OLED_setRST(0);
-        pa_delayMs(10);
-        OLED_setRST(1);
-    }
+    // if (OLED_chosenProtocal == Protocal::Protocal_SPI)
+    // {
+    //     OLED_initSpiGpio();
+    //     OLED_setRST(1);
+    //     OLED_Delay_Ms(1);
+    //     OLED_setRST(0);
+    //     OLED_Delay_Ms(10);
+    //     OLED_setRST(1);
+    // }
 
     OLED_WR_Byte(0xAE, OLED_CMD); //--display off
     OLED_WR_Byte(0x20, OLED_CMD);
