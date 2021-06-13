@@ -1,6 +1,4 @@
-#include "all_config.h"
 
-#if DISPLAY_USE_SSD1306
 
 /////////////////////////////////////////////////////////////////////////////////
 //              GND   电源地
@@ -15,53 +13,53 @@
 
 #include "pa_oled_drv.h"
 
-void OLED_WR_Byte(unsigned char dat, unsigned char cmd)
+void OLED_WR_Byte(unsigned char dat, unsigned char tag)
 {
-    switch (OLED_chosenProtocal)
+    // switch (OLED_chosenProtocal)
+    // {
+    // case Protocal_IIC:
+    if (tag)
     {
-    case Protocal_IIC:
-        if (cmd)
-        {
-            OLED_Write_IIC_Data(dat);
-        }
-        else
-        {
-            OLED_Write_IIC_Command(dat);
-        }
-        break;
-    case Protocal_SPI:
-        if (cmd)
-        {
-            OLED_setCS(1);
-            OLED_setDC(1);
-            OLED_setCS(0);
-            pa_spiTransmit(&dat, 1);
-            OLED_setCS(1);
-            // digitalWrite(cs, HIGH);
-            // digitalWrite(dc, HIGH);
-            // digitalWrite(cs, LOW);
-            // fastSPIwrite(c);
-            // digitalWrite(cs, HIGH);
-            //OLED_Write_IIC_Data(dat);
-        }
-        else
-        {
-            OLED_setCS(1);
-            OLED_setDC(0);
-            OLED_setCS(0);
-            pa_spiTransmit(&dat, 1);
-            OLED_setCS(1);
-            // digitalWrite(cs, HIGH);
-            // digitalWrite(dc, LOW);
-            // digitalWrite(cs, LOW);
-            // fastSPIwrite(c);
-            // digitalWrite(cs, HIGH);
-            //OLED_Write_IIC_Command(dat);
-        }
-        break;
-    default:
-        break;
+        OLED_Write_IIC_Data(dat);
     }
+    else
+    {
+        OLED_Write_IIC_Command(dat);
+    }
+    // break;
+    // case Protocal_SPI:
+    //     if (cmd)
+    //     {
+    //         OLED_setCS(1);
+    //         OLED_setDC(1);
+    //         OLED_setCS(0);
+    //         pa_spiTransmit(&dat, 1);
+    //         OLED_setCS(1);
+    //         // digitalWrite(cs, HIGH);
+    //         // digitalWrite(dc, HIGH);
+    //         // digitalWrite(cs, LOW);
+    //         // fastSPIwrite(c);
+    //         // digitalWrite(cs, HIGH);
+    //         //OLED_Write_IIC_Data(dat);
+    //     }
+    //     else
+    //     {
+    //         OLED_setCS(1);
+    //         OLED_setDC(0);
+    //         OLED_setCS(0);
+    //         pa_spiTransmit(&dat, 1);
+    //         OLED_setCS(1);
+    //         // digitalWrite(cs, HIGH);
+    //         // digitalWrite(dc, LOW);
+    //         // digitalWrite(cs, LOW);
+    //         // fastSPIwrite(c);
+    //         // digitalWrite(cs, HIGH);
+    //         //OLED_Write_IIC_Command(dat);
+    //     }
+    //     break;
+    // default:
+    //     break;
+    // }
 }
 
 /********************************************
@@ -84,7 +82,11 @@ void fill_picture(unsigned char *fill_Data)
         // OLED_WR_Byte(0xb0 + m, 0); //page0-page1
         // OLED_WR_Byte(0x00, 0);     //low column start address
         // OLED_WR_Byte(0x10, 0);     //high column start address
-        OLED_iicWriteLen(SSD1306_I2C_ADDRESS, 0x40, 128, fill_Data + 128 * m, OLED_IICSettingStruct);
+        ByteArr ba[2];
+        uint8_t a = 0x40;
+        ba[0] = ByteArr(1, &a);
+        ba[1] = ByteArr(128, fill_Data + 128 * m);
+        OLED_iicWriteLen(SSD1306_I2C_ADDRESS, 2, ba); //0x40, 128, fill_Data + 128 * m);
         // for (n = 0; n < 128; n++)
         // {
         //     OLED_WR_Byte(fill_Data, 1);
@@ -333,8 +335,7 @@ void OLED_Init(char protocal_id)
 
     OLED_WR_Byte(0xAF, OLED_CMD); //--turn on oled panel
 
+    OLED_On();
     // oled_write_cmd(0x20);    // Set Memory Addressing Mode (20h)
     // oled_write_cmd(0x02);
 }
-
-#endif
