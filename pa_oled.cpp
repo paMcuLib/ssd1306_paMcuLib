@@ -12,6 +12,7 @@
 #include "pa_oledfont.h"
 
 #include "pa_oled_drv.h"
+#include "string.h"
 
 void OLED_WR_Byte(unsigned char dat, unsigned char tag)
 {
@@ -151,13 +152,29 @@ void OLED_Clear(void)
 void OLED_On(void)
 {
     unsigned char i, n;
+    ByteArr ba[2];
+    uint8_t a = 0x40;
+    uint8_t mem[128];
+    memset(mem, 1, sizeof(mem));
+    ba[0] = ByteArr(1, &a);
+    ba[1] = ByteArr(128, mem);
+
+    OLED_WR_Byte(0x21, 0); //page0-page1
+    OLED_WR_Byte(0x00, 0); //low column start address
+    OLED_WR_Byte(0x7f, 0); //high column start a
+    OLED_WR_Byte(0x22, 0); //page0-page1
+    OLED_WR_Byte(0x00, 0); //low column start address
+    OLED_WR_Byte(0x07, 0); //high column start a
+
     for (i = 0; i < 8; i++)
     {
-        OLED_WR_Byte(0xb0 + i, OLED_CMD); //设置页地址（0~7）
-        OLED_WR_Byte(0x00, OLED_CMD);     //设置显示位置—列低地址
-        OLED_WR_Byte(0x10, OLED_CMD);     //设置显示位置—列高地址
-        for (n = 0; n < 128; n++)
-            OLED_WR_Byte(1, OLED_DATA);
+        // OLED_WR_Byte(0xb0 + i, OLED_CMD); //设置页地址（0~7）
+        // OLED_WR_Byte(0x00, OLED_CMD);     //设置显示位置—列低地址
+        // OLED_WR_Byte(0x10, OLED_CMD);     //设置显示位置—列高地址
+
+        OLED_iicWriteLen(SSD1306_I2C_ADDRESS, 2, ba); //0x40, 128, fill_Data + 128 * m);
+        // for (n = 0; n < 128; n++)
+        //     OLED_WR_Byte(1, OLED_DATA);
     } //更新显示
 }
 //在指定位置显示一个字符,包括部分字符
