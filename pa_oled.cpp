@@ -242,7 +242,7 @@ void OLED_ShowNum(unsigned char x, unsigned char y, unsigned int num, unsigned c
     }
 }
 //显示一个字符号串,suze:12/16
-void OLED_ShowString(unsigned char x, unsigned char y, char *chr, unsigned char Char_Size)
+void OLED_ShowString(unsigned char x, unsigned char y, const char *chr, unsigned char Char_Size)
 {
     unsigned char j = 0;
     while (chr[j] != '\0')
