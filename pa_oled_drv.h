@@ -2,7 +2,8 @@
 #define __PA_OLED_DRV_H__
 
 #include "./pa_oled_drv.h"
-#include "paCoreHead/paIIC.h"
+// #include "paCoreHead/paIIC.h"
+#include "paCoreInc/all"
 
 #define SSD1306_I2C_ADDRESS 0x3c //oled地址
 
